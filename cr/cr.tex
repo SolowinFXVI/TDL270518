@@ -1,0 +1,48 @@
+\documentclass[a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[french]{babel}
+\usepackage{listings}
+\usepackage{color}
+\usepackage{amsmath}
+\usepackage{pifont}
+
+\title{Compte - rendu : Evaluation d'expressions arithmétiques}
+\author{JACQUET Julien 21400579}
+
+\begin{document}
+  \pagenumbering{gobble} %desactive la numerotation de page pour la page de garde
+  \maketitle
+  \newpage
+  \pagenumbering{arabic} %reactive la numerotation
+
+\section{Formalisation du Problème}
+  \paragraph{Question 1}
+  Soit une grammaire $G$ définie par $G=(\Sigma,V,S,P)$ telle que : \newline
+  $\Sigma = {\{0,1,2,3,4,5,6,7,8,9,+,-,*,/,(,)\}}$ \newline
+  $V = {\{S,X,Y\}}$ \newline
+  $S = {\{S\}}$
+  \begin{flalign*} %alignement a gauche de la liste de regles de production
+      P = \{ \\
+      & S \rightarrow X ,\\
+      & S \rightarrow Y ,\\
+      & X \rightarrow ( S ) ,\\
+      & X \rightarrow S ,\\
+      & X \rightarrow \varepsilon ,\\
+      & Y \rightarrow S + n ,\\
+      & Y \rightarrow S - n ,\\
+      & Y \rightarrow S * n ,\\
+      & Y \rightarrow S / n ,\\
+      & Y \rightarrow S + S ,\\
+      & Y \rightarrow S - S ,\\
+      & Y \rightarrow S * S ,\\
+      & Y \rightarrow S / S ,\\
+      & Y \rightarrow n \} &
+  \end{flalign*}
+  $n$ = n'importe quelle combinaison contigüe  de $\{0,1,2,3,4,5,6,7,8,9\}$ (exemples : 3,45,1000,7845,986542,etc). \\
+
+
+
+
+\end{document}
