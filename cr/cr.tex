@@ -1,4 +1,6 @@
 \documentclass[a4paper]{article}
+\usepackage{tikz}
+\usetikzlibrary{automata,positioning,arrows}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage{lmodern}
@@ -17,15 +19,15 @@
   \newpage
   \pagenumbering{arabic} %reactive la numerotation
 
-\section{Formalisation du Problème}
-  \paragraph{Question 1}
+\paragraph{Rappel :}
+Nous lisons notre équation arithmétique de droite à gauche.
+\section*{Question 1}
   Soit une grammaire $G$ définie par $G=(\Sigma,V,S,P)$ telle que : \newline
   $\Sigma = {\{0,1,2,3,4,5,6,7,8,9,+,-,*,/,(,)\}}$ \newline
   $V = {\{S\}}$ \newline
   $S = {\{S\}}$
   \begin{flalign*} %alignement a gauche de la liste de regles de production
-      P = \{ \\
-      & S \rightarrow ( S ) ,\\
+      & P = \{ S \rightarrow ( S ) ,\\
       & S \rightarrow \varepsilon ,\\
       & S \rightarrow S + S ,\\
       & S \rightarrow S - S ,\\
@@ -33,9 +35,53 @@
       & S \rightarrow S / S ,\\
       & S \rightarrow n \} &
   \end{flalign*}
-  $n$ = est un nombre quelconque. \\
-\section{Question 3:}
-A FAIRE !
+  $n$ = est un nombre quelconque.
+\section*{Question 3:}
+Etant donné la nature des symboles donnés pour notre langage, il va faut renommer certains éléments de notre langage :
+\begin{flalign*}
+&s = {\{+,*,/\}}\\
+&m = {\{-\}}\\
+&p_o ={\{(\}}\\
+&p_f ={\{)\}}\\
+&n = nombre\\
+&L = {\{(p_o\ (m+\varepsilon)(s+\varepsilon)\ n\ (m+\varepsilon)\ s\ n\ p_f)\* + ((m+\varepsilon)(s+\varepsilon)\ n\ (m+\varepsilon)\ s\ n)\* + n\ \}} &
+\end{flalign*}
+note : Une fois une partie de l'equation evaluée elle devient un $n$ rendant le parenthèsage "récursif". Le $n$ à la fin du langage est présent pour éviter que notre équation soit vide.
+\paragraph{}
+On obtient l'automate suivant, avec une pile. \newline
+$\Gamma={\{x\}}$\newline
+$\delta$ symbole pile vide.\newline
+$@$ peut importe ce qu'il y a dans la pile (x>=0).\newline
+La reconnaissance se fait par pile vide et état final.\newline
+On suppose que la pile est vide en $q_0$.\newline
+Il est impossible de pop si la pile est vide $\rightarrow$ Rejet.\newline
+Le $-$ dans la transition de $q_1$ à $q_6$ signifie que la pile est simplement lue mais pas changée.\newline
+Enfin la pile n'est pas utilisée pour toutes les transitions.\newline
+\hfill \break
+\begin{tikzpicture}[>=stealth',shorten >=1pt,node distance=3.4cm,on grid,auto]
+  \node[state,initial] (q_0) {$q_0$};
+  \node[state] (q_1) [right=of q_0] {$q_1$};
+  \node[state] (q_2) [right=of q_1] {$q_2$};
+  \node[state] (q_3) [above right=of q_1] {$q_3$};
+  \node[state] (q_4) [above left=of q_3] {$q_4$};
+  \node[state] (q_5) [below right=of q_2] {$q_5$};
+  \node[state,accepting] (q_6) [below left=of q_1] {$q_6$};
+  \path[->]
+  (q_0) edge node {n} (q_1)
+        edge [loop above] node {$@,),\uparrow x$} ()
+  (q_1) edge [bend left = 10] node {$+,-,*,/$} (q_2)
+        edge [bend right = 10] node {$-$} (q_3)
+        edge [bend right = 40] node {$\delta,\varepsilon,-$} (q_6)
+        edge [loop below] node {$@,(,\downarrow$} ()
+  (q_2) edge node {@,),$\uparrow x$} (q_5)
+        edge [bend left=10] node {$n$} (q_1)
+  (q_3) edge node {@,(,$\downarrow$} (q_4)
+        edge [bend left] node {$+,/,*$} (q_2)
+        edge [bend right = 60] node {$\varepsilon$} (q_1)
+  (q_4) edge [bend right] node {$n,\varepsilon$} (q_1)
+  (q_5) edge node {$n$} (q_1);
+
+\end{tikzpicture}
 
 
 

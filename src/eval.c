@@ -22,6 +22,12 @@ typedef struct liste_token{
   struct liste_token *next;
 }liste_token;
 
+typedef struct arbre_token{
+  token t;
+  struct arbre_token *left;
+  struct arbre_token *right;
+}arbre_token;
+
 liste_token* create(token t,liste_token* next){
   liste_token* new_liste_token = (liste_token*)malloc(sizeof(liste_token));
   if(new_liste_token == NULL){
