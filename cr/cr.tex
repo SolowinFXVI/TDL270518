@@ -21,26 +21,19 @@
   \paragraph{Question 1}
   Soit une grammaire $G$ définie par $G=(\Sigma,V,S,P)$ telle que : \newline
   $\Sigma = {\{0,1,2,3,4,5,6,7,8,9,+,-,*,/,(,)\}}$ \newline
-  $V = {\{S,X,Y\}}$ \newline
+  $V = {\{S\}}$ \newline
   $S = {\{S\}}$
   \begin{flalign*} %alignement a gauche de la liste de regles de production
       P = \{ \\
-      & S \rightarrow X ,\\
-      & S \rightarrow Y ,\\
-      & X \rightarrow ( S ) ,\\
-      & X \rightarrow S ,\\
-      & X \rightarrow \varepsilon ,\\
-      & Y \rightarrow S + n ,\\
-      & Y \rightarrow S - n ,\\
-      & Y \rightarrow S * n ,\\
-      & Y \rightarrow S / n ,\\
-      & Y \rightarrow S + S ,\\
-      & Y \rightarrow S - S ,\\
-      & Y \rightarrow S * S ,\\
-      & Y \rightarrow S / S ,\\
-      & Y \rightarrow n \} &
+      & S \rightarrow ( S ) ,\\
+      & S \rightarrow \varepsilon ,\\
+      & S \rightarrow S + S ,\\
+      & S \rightarrow S - S ,\\
+      & S \rightarrow S * S ,\\
+      & S \rightarrow S / S ,\\
+      & S \rightarrow n \} &
   \end{flalign*}
-  $n$ = n'importe quelle combinaison contigüe  de $\{0,1,2,3,4,5,6,7,8,9\}$ (exemples : 3,45,1000,7845,65535,etc). \\
+  $n$ = est un nombre quelconque. \\
 \section{Question 3:}
 A FAIRE !
 
