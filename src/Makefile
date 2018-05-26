@@ -11,7 +11,7 @@ run:
 	./eval	'(2*((3+45)-8))+14/3'
 
 run2:
-	./eval	'2*(3+1)'
+	./eval	'(94/3)+0'
 
 compil:	eval.c
 	gcc	-o	eval	eval.c	-Wall
