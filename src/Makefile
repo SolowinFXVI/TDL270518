@@ -4,8 +4,14 @@ all:	eval.c
 test:
 	make	clean	&&	make	compil	&&	make	run
 
-run	:
+test2:
+	make	clean	&&	make	compil	&&	make	run2
+
+run:
 	./eval	'(2*((3+45)-8))+14/3'
+
+run2:
+	./eval	'2*(3+1)'
 
 compil:	eval.c
 	gcc	-o	eval	eval.c	-Wall
