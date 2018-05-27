@@ -399,16 +399,18 @@ arbre_token* maketree(liste_token* head){
  * @return val resultat des operations.
  */
 int evaluate(liste_token* head){
-  token val_tok;
+  token val_tok;//token pour la valeur
   val_tok.type = ENTIER;
   val_tok.op = '!';
   val_tok.par = '!';
   val_tok.val = 0;
+
   int val = 0;
   int nbr;
   stack_node *top;
   init_stack(&top);
-  while(head != NULL){
+
+  while(head != NULL){//
     if(head->t.type == PARENTHESE){
       if(head->t.par == ')'){
         top = push(top,head->t);
@@ -429,9 +431,8 @@ int evaluate(liste_token* head){
               printtoken(*top_of_stack(top));
               val = nbr - top_of_stack(top)->val;
               printf("valtmp  - = %d \n",val);
-              /*
-              Incomplet (cas specifique du moins en temps qu'operateur ou signe)
-              */
+              //Incomplet (cas specifique du moins en temps qu'operateur ou signe)
+
             }
             else if(top_of_stack(top)->op == '*'){
               top = pop(top);
@@ -442,13 +443,12 @@ int evaluate(liste_token* head){
             else if(top_of_stack(top)->op == '/'){
               top = pop(top);
               printtoken(*top_of_stack(top));
-              val = nbr + top_of_stack(top)->val;
+              val = nbr / top_of_stack(top)->val;
               printf("valtmp / = %d \n",val);
             }
           }
           else if(top_of_stack(top)->type == ENTIER){
             nbr = top_of_stack(top)->val;
-            printtoken(*top_of_stack(top));
           }
           top = pop(top);
         }
@@ -464,7 +464,7 @@ int evaluate(liste_token* head){
     head = head->next;
   }
   //il faut maintenant finir d'evaluer la pile :
-  while(is_empty(top)== 0){//calcule
+  /*while(is_empty(top)== 0){//calcule
     printf("while calcule final\n");
     printtoken(*top_of_stack(top));
     if(top_of_stack(top)->type == OPERATEUR){
@@ -479,9 +479,9 @@ int evaluate(liste_token* head){
         printtoken(*top_of_stack(top));
         val = nbr - top_of_stack(top)->val;
         printf("valtmp final - = %d\n",val);
-        /*
-        Incomplet (cas specifique du moins en temps qu'operateur ou signe)
-        */
+
+        //Incomplet (cas specifique du moins en temps qu'operateur ou signe)
+
       }
       if(top_of_stack(top)->op == '*'){
         top = pop(top);
@@ -501,6 +501,54 @@ int evaluate(liste_token* head){
       printtoken(*top_of_stack(top));
     }
     top = pop(top);
+    if(is_empty(top)==0){
+      tmp_tok = *top_of_stack(top);
+      top = pop(top);
+      if(is_empty(top)==1){
+        printf("stack empty");
+      }
+      else{
+        top = push(top,tmp_tok);
+        val_tok.val = val;
+        top = push(top,val_tok);
+      }
+    }
+  }*/
+  val = top_of_stack(top)->val;
+  while(is_empty(top)==0){
+    printtoken(*top_of_stack(top));
+    printf("valfinal %d\n",val);
+    if(top_of_stack(top)->type == OPERATEUR){
+      if(top_of_stack(top)->op == '+'){
+        top = pop(top);
+        val = val + top_of_stack(top)->val;
+        top = pop(top);
+        val_tok.val = val;
+        top = push(top,val_tok);
+      }
+      else if(top_of_stack(top)->op == '-'){
+        top = pop(top);
+        val = val - top_of_stack(top)->val;
+        top = pop(top);
+        val_tok.val = val;
+        top = push(top,val_tok);
+      }
+      else if(top_of_stack(top)->op == '*'){
+        top = pop(top);
+        val = val * top_of_stack(top)->val;
+        top = pop(top);
+        val_tok.val = val;
+        top = push(top,val_tok);
+      }
+      else if(top_of_stack(top)->op == '/'){
+        top = pop(top);
+        val = val / top_of_stack(top)->val;
+        top = pop(top);
+        val_tok.val = val;
+        top = push(top,val_tok);
+      }
+    }
+    top = pop(top);
   }
   printf("final = %d\n",val);
   return val;
@@ -515,14 +563,27 @@ int arbre_to_int(arbre_token *at){
 /**
  * Main
  */
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[]){
   liste_token* head = NULL;
+
+  int i;
+  int v = 0;
+  int size = argc -1;
+  char *str = (char *)malloc(v);
+
   int res = 0;
-  if(argc <= 1){
+  if(argc == 1){
     perror("Equation manquante ?\n");
     exit(EXIT_FAILURE);
   }
-  head = string_to_token(head,argv[1]);
+
+  for(i=1;i<=size;i++){
+    str = (char*)realloc(str,(v + strlen(argv[i])));
+    strcat(str,argv[i]);
+  }
+  printf("Evaluation de l'equation : %s\n",str);
+
+  head = string_to_token(head,str);
   head = revert(head);//inverse la liste pour evaluer de droite a gauche
   if(check_arithm(head) != 0){
     destroy(head);
