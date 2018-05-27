@@ -1,17 +1,15 @@
-all:	eval.c
-	make	compil
+all:
+	make	test
 
 test:
-	make	clean	&&	make	compil	&&	make	run
+	make	clean	&&	make	compil	&&	make	runtest
 
-test2:
-	make	clean	&&	make	compil	&&	make	run2
-
-run:
-	./eval	'(2*((3+45)-8))+14/3'
-
-run2:
-	./eval	'2+(3*(3+4)+18/2)'
+runtest:
+	./eval	'(2*('	'(3+'	'45)-8))+14'	'/3'
+	./eval  '(50+4)'	'((0))'	'/3'
+	./eval	'6-7'
+	./eval	'67898*('	'345/(2*(4+3))'	')'	'+7'
+	./eval	')2*(3+45)-8)'	')+14/3'
 
 compil:	eval.c
 	gcc	-o	eval	eval.c	-Wall

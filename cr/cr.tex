@@ -19,8 +19,9 @@
   \newpage
   \pagenumbering{arabic} %reactive la numerotation
 
-\paragraph{Rappel :}
-Nous lisons notre équation arithmétique de droite à gauche.
+\paragraph{Note :}
+$cr.tex$ est situé dans le sous-dossier $cr$. $eval.c$ et $Makefile$ sont situés dans le sous-dossier $src$.
+
 \section*{Question 1}
   Soit une grammaire $G$ définie par $G=(\Sigma,V,S,P)$ telle que : \newline
   $\Sigma = {\{0,1,2,3,4,5,6,7,8,9,+,-,*,/,(,)\}}$ \newline
@@ -37,7 +38,7 @@ Nous lisons notre équation arithmétique de droite à gauche.
   \end{flalign*}
   $n$ = est un nombre quelconque.
 \section*{Question 3:}
-Etant donné la nature des symboles donnés pour notre langage, il va faut renommer certains éléments de notre langage :
+Etant donné la nature des symboles donnés pour notre langage, il faut renommer certains éléments de notre langage :
 \begin{flalign*}
 &s = {\{+,*,/\}}\\
 &m = {\{-\}}\\
@@ -82,8 +83,23 @@ Enfin la pile n'est pas utilisée pour toutes les transitions.\newline
   (q_5) edge node {$n$} (q_1);
 
 \end{tikzpicture}
+\section*{Question 5:}
+Je n'ai pas résusi à transformer mon arbre en int.\newline
+Du coup pour evaluer mon expression je vais utiliser une pile d'évaluation. \newline
+On prends chaques éléments de la liste de token et on les ajoute à la pile , lorsque l'on rencontre une parenthèse fermante on evalue le contenu de la pile jusqu'à la première parenthèse ouvrante. On vide les tokens du bloc de parenthèses, et on push la valeur numérique resultant de l'évaluation du bloc.
+Une fois que la liste de token à été complètement chargée dans la pile, on fini d'évaluer la pile jusqu'à ce qu'elle soit vide. Le dernier token présent dans la pile sera un entier égal au resultat de l'évaluation de l'expression entière.
 
+\section*{Question 6:}
+En théorie pour prendre en compte les espaces présents dans l'expression il faudrait simplement fusionner tous les $argv$ en une seule expression continue. Cependant les parenthèses ont une signification spéciale pour le $shell$ et mettre des espaces entre des blocs de parenthèse entrainera des erreurs de $shell$.
+Il y a deux solutions pour contourner ce probleme :\newline
+Utiliser des "escapes" : $`expression`$ (accents graves(alt-gr + 7)) ou des guillemets $"expression"$ ou meme $'expression'$.
+Il est toujours possible d'utiliser des espaces tant que chaque fragment est encadré.
 
-
+\section*{Tests:}
+Le premier test est celui donné dans l'énoncé.\newline
+Le second test est pour montrer un exemple inhabituel mais syntaxiquement correct.\newline
+Le troisième test est pour montrer un résultat négatif.\newline
+Le quatrième test est pour montrer des nombres plus grands.\newline
+Le cinquième test est le même que le premier mais avec une parenthèse inversée, la syntaxe est donc NON conforme.
 
 \end{document}

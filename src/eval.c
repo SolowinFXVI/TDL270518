@@ -1,8 +1,14 @@
+/**
+ *Projet - Theorie des langages
+ *Auteur : JACQUET Julien 21400579.
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
 #include <errno.h>
+
 /**
  * Enumeration pour les types de tokens.
  */
@@ -48,6 +54,24 @@ typedef struct stack_node{
 }stack_node;
 
 /**
+ * Detruit un liste de tokens
+ * @param head liste de tokens
+ */
+void destroy(liste_token *head){
+  liste_token *ptr, *tmp;
+  if(head != NULL){
+    ptr = head->next;
+    head->next = NULL;
+    while(ptr != NULL){
+      tmp= ptr->next;
+      free(ptr);
+      ptr =tmp;
+    }
+    free(head);
+  }
+}
+
+/**
  * Allocation pour un nouveau token dans la liste de tokens
  * @param  t    token
  * @param  next token suivant
@@ -57,7 +81,8 @@ liste_token* create(token t,liste_token* next){
   liste_token* new_liste_token = (liste_token*)malloc(sizeof(liste_token));
   if(new_liste_token == NULL){
     perror("Impossible de creer une nouvelle liste_token \n");
-    exit(1);
+    destroy(next);
+    exit(EXIT_FAILURE);
   }
   new_liste_token->t = t;
   new_liste_token->next = next;
@@ -115,36 +140,36 @@ liste_token* string_to_token (liste_token* head, char *string){
   int val = 0;
   token t;
   while(length >= 0){
-    if(isdigit(string[length])){
+    if(isdigit(string[length])){//si c'est un chiffre ajouter chaques chiffres pour former un nombre (e.g.:459 = 9 + 50 + 400)
       val = val + ((string[length] - '0') * power(10,numcount));
       numcount++;
     }
-    else{
-      if(numcount != 0){
+    else{//n'est pas un chiffre
+      if(numcount != 0){//un nombre attends d'etre transforme en token
         t.type = ENTIER;
         t.par ='!';
         t.op='!';
         t.val=val;
         head = prepend(head,t);
-        printtoken(t);
+        //printtoken(t);
       }
       numcount = 0;
       val = 0;
-      if((string[length] == '(') || (string[length] == ')')){
+      if((string[length] == '(') || (string[length] == ')')){//pour les parentheses
         t.type = PARENTHESE;
         t.par=string[length];
         t.op='!';
         t.val= 0;
         head = prepend(head,t);
-        printtoken(t);
+        //printtoken(t);
       }
-      if((string[length] == '+') || (string[length] == '-') || (string[length] == '*') || (string[length] == '/')){
+      if((string[length] == '+') || (string[length] == '-') || (string[length] == '*') || (string[length] == '/')){// pour les operateurs
         t.type = OPERATEUR;
         t.par ='!';
         t.op = string[length];
         t.val = 0;
         head = prepend(head,t);
-        printtoken(t);
+        //printtoken(t);
       }
     }
     length--;
@@ -155,7 +180,7 @@ liste_token* string_to_token (liste_token* head, char *string){
     t.op='\0';
     t.val=val;
     head = prepend(head,t);
-    printtoken(t);
+    //printtoken(t);
   }
   return head;
 }
@@ -178,7 +203,7 @@ stack_node* push(stack_node* top,token s){
   stack_node* tmp = (stack_node*)malloc(sizeof(stack_node));
   if(tmp == NULL){
     perror("Impossible de creer un element de pile");
-    exit(EXIT_FAILURE);
+    exit(EXIT_FAILURE);//Ne vide pas la memoire (mais si cette erreure est presente, la memoire est deja pleine (tres probablement)).
   }
   tmp->s = s;
   tmp->prev = top;
@@ -309,24 +334,6 @@ int check_arithm(liste_token *head){
 }
 
 /**
- * Detruit un liste de tokens
- * @param head liste de tokens
- */
-void destroy(liste_token *head){
-  liste_token *ptr, *tmp;
-  if(head != NULL){
-    ptr = head->next;
-    head->next = NULL;
-    while(ptr != NULL){
-      tmp= ptr->next;
-      free(ptr);
-      ptr =tmp;
-    }
-    free(head);
-  }
-}
-
-/**
  * Inverse une liste de tokens donnee en entree
  * @param  head liste de tokens a(head)->b->c
  * @return head liste de tokens c(head)->b->a
@@ -362,7 +369,7 @@ arbre_token* newNode(liste_token* head){
   return temp;
 }
 
-/* Je n'arrive pas a faire fonctionner de cette facon.
+/*//Je n'arrive pas a faire fonctionner de cette facon.
 arbre_token* maketree(liste_token* head){
   stack_node *top;
   arbre_token *t, *t1, *t2;
@@ -392,8 +399,12 @@ arbre_token* maketree(liste_token* head){
   return t;
 }*/
 
+/*//Cette fonction est censee fonctionner avec maketree (qui ne fonctionne pas).
+int arbre_to_int(arbre_token *at){
+  return 0;
+};*/
+
 /**
- * ###############BUG########
  * Fonction qui calcule le resultat de notre equation a partir de notre liste de tokens.
  * @param head liste de tokens
  * @return val resultat des operations.
@@ -410,41 +421,34 @@ int evaluate(liste_token* head){
   stack_node *top;
   init_stack(&top);
 
-  while(head != NULL){//
+  while(head != NULL){//Ajoute toute la liste dans la pile
     if(head->t.type == PARENTHESE){
-      if(head->t.par == ')'){
+      if(head->t.par == '('){
         top = push(top,head->t);
       }
-      if(head->t.par == '('){
-        while(top_of_stack(top)->par != ')'){//calcule
-          printf("calcule in \n");
-          printtoken(*top_of_stack(top));
+      if(head->t.par == ')'){
+        while(top_of_stack(top)->par != '('){//calcule jusqu'a la prochaine parenthese opposee
+          //printtoken(*top_of_stack(top));
           if(top_of_stack(top)->type == OPERATEUR){
             if(top_of_stack(top)->op == '+'){
               top = pop(top);
-              printtoken(*top_of_stack(top));
-              val = nbr + top_of_stack(top)->val;
-              printf("valtmp + = %d \n",val);
+              //printtoken(*top_of_stack(top));
+              val = top_of_stack(top)->val + nbr;
             }
             else if(top_of_stack(top)->op == '-'){
               top = pop(top);
-              printtoken(*top_of_stack(top));
-              val = nbr - top_of_stack(top)->val;
-              printf("valtmp  - = %d \n",val);
-              //Incomplet (cas specifique du moins en temps qu'operateur ou signe)
-
+              //printtoken(*top_of_stack(top));
+              val = top_of_stack(top)->val - nbr;
             }
             else if(top_of_stack(top)->op == '*'){
               top = pop(top);
-              printtoken(*top_of_stack(top));
-              val = nbr * top_of_stack(top)->val;
-              printf("valtmp  * = %d \n",val);
+              //printtoken(*top_of_stack(top));
+              val = top_of_stack(top)->val * nbr;
             }
             else if(top_of_stack(top)->op == '/'){
               top = pop(top);
-              printtoken(*top_of_stack(top));
-              val = nbr / top_of_stack(top)->val;
-              printf("valtmp / = %d \n",val);
+              //printtoken(*top_of_stack(top));
+              val = top_of_stack(top)->val / nbr;
             }
           }
           else if(top_of_stack(top)->type == ENTIER){
@@ -460,89 +464,36 @@ int evaluate(liste_token* head){
     else{
       top= push(top,head->t);
     }
-    //val = 0;
     head = head->next;
   }
-  //il faut maintenant finir d'evaluer la pile :
-  /*while(is_empty(top)== 0){//calcule
-    printf("while calcule final\n");
-    printtoken(*top_of_stack(top));
-    if(top_of_stack(top)->type == OPERATEUR){
-      if(top_of_stack(top)->op == '+'){
-        top = pop(top);
-        printtoken(*top_of_stack(top));
-        val = nbr + top_of_stack(top)->val;
-        printf("valtmp final + = %d\n",val);
-      }
-      if(top_of_stack(top)->op == '-'){
-        top = pop(top);
-        printtoken(*top_of_stack(top));
-        val = nbr - top_of_stack(top)->val;
-        printf("valtmp final - = %d\n",val);
-
-        //Incomplet (cas specifique du moins en temps qu'operateur ou signe)
-
-      }
-      if(top_of_stack(top)->op == '*'){
-        top = pop(top);
-        printtoken(*top_of_stack(top));
-        val = nbr * top_of_stack(top)->val;
-        printf("valtmp final * = %d\n",val);
-      }
-      if(top_of_stack(top)->op == '/'){
-        top = pop(top);
-        printtoken(*top_of_stack(top));
-        val = nbr / top_of_stack(top)->val;
-        printf("valtmp final / = %d\n",val);
-      }
-    }
-    else if(top_of_stack(top)->type == ENTIER){
-      nbr = top_of_stack(top)->val;
-      printtoken(*top_of_stack(top));
-    }
-    top = pop(top);
-    if(is_empty(top)==0){
-      tmp_tok = *top_of_stack(top);
-      top = pop(top);
-      if(is_empty(top)==1){
-        printf("stack empty");
-      }
-      else{
-        top = push(top,tmp_tok);
-        val_tok.val = val;
-        top = push(top,val_tok);
-      }
-    }
-  }*/
   val = top_of_stack(top)->val;
-  while(is_empty(top)==0){
-    printtoken(*top_of_stack(top));
-    printf("valfinal %d\n",val);
+  while(is_empty(top)==0){//Evaluation du reste de la pile.
+    //printtoken(*top_of_stack(top)); //decommenter pour affichage du fonctionnement.
     if(top_of_stack(top)->type == OPERATEUR){
       if(top_of_stack(top)->op == '+'){
         top = pop(top);
-        val = val + top_of_stack(top)->val;
+        val = top_of_stack(top)->val + val;
         top = pop(top);
         val_tok.val = val;
         top = push(top,val_tok);
       }
       else if(top_of_stack(top)->op == '-'){
         top = pop(top);
-        val = val - top_of_stack(top)->val;
+        val = top_of_stack(top)->val - val;
         top = pop(top);
         val_tok.val = val;
         top = push(top,val_tok);
       }
       else if(top_of_stack(top)->op == '*'){
         top = pop(top);
-        val = val * top_of_stack(top)->val;
+        val = top_of_stack(top)->val * val;
         top = pop(top);
         val_tok.val = val;
         top = push(top,val_tok);
       }
       else if(top_of_stack(top)->op == '/'){
         top = pop(top);
-        val = val / top_of_stack(top)->val;
+        val = top_of_stack(top)->val / val;
         top = pop(top);
         val_tok.val = val;
         top = push(top,val_tok);
@@ -550,22 +501,14 @@ int evaluate(liste_token* head){
     }
     top = pop(top);
   }
-  printf("final = %d\n",val);
   return val;
 }
-
-/*
-int arbre_to_int(arbre_token *at){
-  return 0;
-};*/
-
 
 /**
  * Main
  */
 int main(int argc, char *argv[]){
   liste_token* head = NULL;
-
   int i;
   int v = 0;
   int size = argc -1;
@@ -576,7 +519,9 @@ int main(int argc, char *argv[]){
     perror("Equation manquante ?\n");
     exit(EXIT_FAILURE);
   }
-
+  /**
+   * Concatene tous les arguments en entree en une seule equation.
+   */
   for(i=1;i<=size;i++){
     str = (char*)realloc(str,(v + strlen(argv[i])));
     strcat(str,argv[i]);
@@ -587,12 +532,15 @@ int main(int argc, char *argv[]){
   head = revert(head);//inverse la liste pour evaluer de droite a gauche
   if(check_arithm(head) != 0){
     destroy(head);
-    perror("Expression non conforme !\n");
+    free(str);
+    perror("Expression non conforme !\n\n");
     exit(EXIT_FAILURE);
   }
-  res = evaluate(head);
-  printf("RESULTAT = %d \n",res);
+  head = revert(head);//nouvelle inversion pour satisfaire le sens d'evaluation
+  res = evaluate(head);//evaluation
+  printf("RESULTAT:\t %s = %d \n",str,res);
   destroy(head);//detruit la liste
-  printf("Fin.\n");
+  free(str);
+  printf("Fin.\n\n");
   return 0;
 }
